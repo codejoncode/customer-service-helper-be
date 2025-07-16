@@ -54,4 +54,4 @@ src/ ├── models/           # Mongoose schemas ├── controllers/      
 
 ```bash
 git clone https://github.com/your-username/customer-service-helper-be.git
-cd customer-service-helper-backend
+cd customer-service-helper-be
