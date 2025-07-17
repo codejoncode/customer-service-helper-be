@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { prisma } from '../config/db'
+import type { Article } from '../generated/prisma'
 
 export const getReasons = async (
   req: Request,
@@ -15,20 +16,35 @@ export const getReasons = async (
   }
 }
 
+
+
 export const getReasonArticles = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const { orgId, reasonId } = req.params
-    const mappings = await prisma.action.findMany({
-      where: { orgId, callReasonId: reasonId },
-      include: { defaultArticle: true },
-    })
-    const articles = mappings.map((m: { defaultArticle: any }) => m.defaultArticle)
+
+    // 1) Tell TS exactly what shape comes back
+    const mappings: Array<{ defaultArticle: Article | null }> =
+      await prisma.action.findMany({
+        where: { orgId, callReasonId: reasonId },
+        select: { defaultArticle: true },
+      })
+
+    // 2) Now TS knows:
+    //    mappings is Array<{ defaultArticle: Article | null }>
+    // so m.defaultArticle is Article|null
+
+    const articles: Article[] = mappings
+      .map((m: { defaultArticle: Article | null }): Article | null => m.defaultArticle)
+      .filter((a: Article | null): a is Article => a !== null)
+
     res.json(articles)
   } catch (err) {
     next(err)
   }
 }
+
+
