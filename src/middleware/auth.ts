@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
+import { Role } from '../types/Role'
 
 // augment Express Request to include `user`
 declare global {
@@ -7,8 +8,8 @@ declare global {
     interface Request {
       user?: {
         userId: string
-        orgId: string
-        role: string
+        orgId: string 
+        role: 'ADMIN' | 'MANAGER' | 'AGENT'
       }
     }
   }
@@ -38,7 +39,7 @@ export default async function auth(
     if (
       typeof payload.userId !== 'string' ||
       typeof payload.orgId !== 'string' ||
-      typeof payload.role !== 'string'
+      typeof payload.role !== 'string' 
     ) {
       throw new Error('Invalid token payload')
     }
@@ -46,10 +47,13 @@ export default async function auth(
     req.user = {
       userId: payload.userId,
       orgId: payload.orgId,
-      role: payload.role
+      role: payload.role as Role
     }
     return next()
   } catch (err) {
     return res.status(401).json({ error: 'Unauthorized' })
   }
 }
+
+
+

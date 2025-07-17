@@ -1,5 +1,6 @@
 import { prisma } from './config/db';
 import bcrypt from 'bcrypt';
+import {knowledgeBase} from "./data/knowledgeBase";
 
 async function main() {
   console.log('🗑 Dropping existing data...');
@@ -23,19 +24,13 @@ async function main() {
           ]
         },
         articles: {
-          create: [
-            {
-              reason: 'Reset Password',
-              required: [
-                'Verify identity with a security code',
-                'Ensure the new password is at least 8 characters long'
-              ],
-              template: `Call Reason: Reset Password\nActions Taken:\n- Verified identity…`,
-              url: '/articles/reset-password',
-              fullArticle: `If a customer …`
-            },
-            // add more articles as needed…
-          ]
+          create: knowledgeBase.map((entry) => ({
+            reason: entry.reason,
+            required: entry.required,
+            template: entry.template,
+            url: entry.url,
+            fullArticle: entry.fullArticle,
+          })),
         },
         closingItems: {
           create: [
