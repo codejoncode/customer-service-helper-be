@@ -14,18 +14,20 @@ datasource db {
 }
 
 model Organization {
-  id              String    @id @default(cuid())
-  name            String
-  plan            Plan      @default(FREE)
-  agentLimit      Int       @default(3)
-  agents          Agent[]
-  members         Member[]
-  actions         Action[]
-  articles        Article[]
-  closingItems    ClosingItem[]
-  callReasons     CallReason[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id               String       @id @default(cuid())
+  name             String
+  plan             Plan         @default(FREE)
+  agentLimit       Int          @default(3)
+  validationFields String[]     @default([]) // ← NEW
+  agents           Agent[]
+  members          Member[]
+  actions          Action[]
+  articles         Article[]
+  closingItems     ClosingItem[]
+  callReasons      CallReason[]
+  callLogs         CallLog[]
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 }
 
 model Agent {
@@ -34,13 +36,14 @@ model Agent {
   username       String         @unique
   passwordHash   String
   role           Role           @default(AGENT)
-  organization   Organization   @relation(fields: [orgId], references: [id])
-  orgId          String
+  orgId          String?        // ← now optional
+  organization   Organization?  @relation(fields: [orgId], references: [id])
+  callLogs       CallLog[]
 }
 
 model Member {
-  id             String       @id @default(cuid())
-  memberId       String       @unique
+  id             String         @id @default(cuid())
+  memberId       String         @unique
   name           String
   dob            String
   phone          String
@@ -48,41 +51,62 @@ model Member {
   city           String
   state          String
   zipcode        String
-  organization   Organization @relation(fields: [orgId], references: [id])
   orgId          String
+  organization   Organization   @relation(fields: [orgId], references: [id])
+  callLogs       CallLog[]
 }
 
 model Action {
   id               String       @id @default(cuid())
   label            String
   defaultArticleId String?
-  organization     Organization @relation(fields: [orgId], references: [id])
   orgId            String
+  organization     Organization @relation(fields: [orgId], references: [id])
 }
 
 model Article {
-  id            String       @id @default(cuid())
+  id            String         @id @default(cuid())
   reason        String
   required      String[]
   template      String
   url           String
   fullArticle   String
-  organization  Organization @relation(fields: [orgId], references: [id])
   orgId         String
+  organization  Organization   @relation(fields: [orgId], references: [id])
+  callLogs      CallLog[]
 }
 
 model ClosingItem {
-  id            String       @id @default(cuid())
+  id            String         @id @default(cuid())
   label         String
-  organization  Organization @relation(fields: [orgId], references: [id])
   orgId         String
+  organization  Organization   @relation(fields: [orgId], references: [id])
 }
 
 model CallReason {
-  id            String       @id @default(cuid())
+  id            String         @id @default(cuid())
   label         String
-  organization  Organization @relation(fields: [orgId], references: [id])
   orgId         String
+  organization  Organization   @relation(fields: [orgId], references: [id])
+  callLogs      CallLog[]
+}
+
+model CallLog {
+  id               String       @id @default(cuid())
+  orgId            String
+  org              Organization @relation(fields: [orgId], references: [id])
+  agentId          String
+  agent            Agent        @relation(fields: [agentId], references: [id])
+  memberId         String
+  member           Member       @relation(fields: [memberId], references: [id])
+  reasonId         String
+  callReason       CallReason   @relation(fields: [reasonId], references: [id])
+  articleId        String
+  article          Article      @relation(fields: [articleId], references: [id])
+  actionsTaken     String[]     // array of labels
+  closingChecklist String[]     // array of prompts
+  notes            String
+  createdAt        DateTime     @default(now())
 }
 
 enum Role {
