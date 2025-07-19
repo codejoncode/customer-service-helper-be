@@ -18,21 +18,20 @@ The Customer Service Helper backend is built with **Node.js**, **Express**, and 
 
 ## 🧪 Tech Stack
 
-| Layer       | Technology             |
-|------------|------------------------|
-| Runtime     | Node.js                |
-| Framework   | Express.js             |
-| Database    | MongoDB (via Mongoose) |
-| Auth        | JSON Web Tokens (JWT)  |
-| Security    | Bcrypt, Role Guards    |
-| Utilities   | Dotenv, CORS, Helmet   |
+| Layer     | Technology             |
+| --------- | ---------------------- |
+| Runtime   | Node.js                |
+| Framework | Express.js             |
+| Database  | MongoDB (via Mongoose) |
+| Auth      | JSON Web Tokens (JWT)  |
+| Security  | Bcrypt, Role Guards    |
+| Utilities | Dotenv, CORS, Helmet   |
 
 ---
 
 ## 📁 Folder Structure
-src/ ├── models/           # Mongoose schemas ├── controllers/      # Business logic for API routes ├── middleware/       # Auth and role enforcement ├── routes/           # Express route handlers ├── seed.js           # Demo seed script for 3 organizations ├── app.js            # Main Express app .env                  # Environment variables
 
-
+src/ ├── models/ # Mongoose schemas ├── controllers/ # Business logic for API routes ├── middleware/ # Auth and role enforcement ├── routes/ # Express route handlers ├── seed.js # Demo seed script for 3 organizations ├── app.js # Main Express app .env # Environment variables
 
 ---
 
@@ -55,3 +54,4 @@ src/ ├── models/           # Mongoose schemas ├── controllers/      
 ```bash
 git clone https://github.com/your-username/customer-service-helper-be.git
 cd customer-service-helper-be
+```

@@ -1,8 +1,12 @@
-import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../config/db';
+import { Request, Response, NextFunction } from "express";
+import { prisma } from "../config/db";
 
 // GET /organizations/:orgId/members
-export const getMembers = async (req: Request, res: Response, next: NextFunction) => {
+export const getMembers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { orgId } = req.params;
     const members = await prisma.member.findMany({ where: { orgId } });
@@ -13,19 +17,15 @@ export const getMembers = async (req: Request, res: Response, next: NextFunction
 };
 
 // POST /organizations/:orgId/members
-export const addMember = async (req: Request, res: Response, next: NextFunction) => {
+export const addMember = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { orgId } = req.params;
-    const {
-      memberId,
-      name,
-      dob,
-      phone,
-      streetAddress,
-      city,
-      state,
-      zipcode,
-    } = req.body;
+    const { memberId, name, dob, phone, streetAddress, city, state, zipcode } =
+      req.body;
 
     const member = await prisma.member.create({
       data: {
@@ -48,7 +48,11 @@ export const addMember = async (req: Request, res: Response, next: NextFunction)
 };
 
 // POST /organizations/:orgId/members/validate
-export const validateMember = async (req: Request, res: Response, next: NextFunction) => {
+export const validateMember = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { orgId } = req.params;
 
@@ -58,7 +62,7 @@ export const validateMember = async (req: Request, res: Response, next: NextFunc
     });
 
     if (!org) {
-      return res.status(404).json({ message: 'Organization not found' });
+      return res.status(404).json({ message: "Organization not found" });
     }
 
     // Build dynamic filter based on validationFields

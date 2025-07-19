@@ -1,9 +1,10 @@
 import request from 'supertest'
-import app from '../app'
 import { managerToken, agentToken, orgId } from './setup'
 
-describe('Validation Rules Routes', () => {
-  test('GET /api/orgs/:orgId/validation-rules → 401 if no token', async () => {
+import app from "../app";
+
+describe('⚙️ Validation Rules', () => {
+  test('GET /api/orgs/:orgId/validation-rules → 401 no token', async () => {
     const res = await request(app).get(`/api/orgs/${orgId}/validation-rules`)
     expect(res.status).toBe(401)
   })
@@ -15,7 +16,7 @@ describe('Validation Rules Routes', () => {
     expect(res.status).toBe(403)
   })
 
-  test('GET /api/orgs/:orgId/validation-rules → 200 as MANAGER', async () => {
+  test('GET /api/orgs/:orgId/validation-rules → 200 list fields', async () => {
     const res = await request(app)
       .get(`/api/orgs/${orgId}/validation-rules`)
       .set('Authorization', `Bearer ${managerToken}`)

@@ -1,16 +1,16 @@
-import { Router } from 'express'
-import auth from '../middleware/auth'
-import roles from '../middleware/roles'
-import { getReasons, getReasonArticles } from '../controllers/reasonController'
+import { Router } from "express";
+import auth from "../middleware/auth";
+import roles from "../middleware/roles";
+import { getReasons, getReasonArticles } from "../controllers/reasonController";
 
-const router = Router({ mergeParams: true })
+const router = Router({ mergeParams: true });
 
-router.get('/', auth, roles(['ADMIN', 'MANAGER', 'AGENT']), getReasons)
+router.get("/", auth, roles(["ADMIN", "MANAGER", "AGENT"]), getReasons);
 router.get(
-  '/:reasonId/articles',
+  "/:reasonId/articles",
   auth,
-  roles(['ADMIN', 'MANAGER', 'AGENT']),
+  roles(["ADMIN", "MANAGER", "AGENT"]),
   getReasonArticles
-)
+);
 
 export default router;

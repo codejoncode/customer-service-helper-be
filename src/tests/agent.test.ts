@@ -1,8 +1,9 @@
 import request from 'supertest'
-import app from '../app'
-import { adminToken, managerToken, agentToken, orgId } from './setup'
+import { adminToken, managerToken, orgId } from './setup'
 
-describe('Agent Routes', () => {
+import app from "../app";
+
+describe('👥 Agent Routes', () => {
   let newAgentId: string
 
   test('GET /api/orgs/:orgId/agents → 200 MANAGER', async () => {
@@ -17,7 +18,7 @@ describe('Agent Routes', () => {
     const res = await request(app)
       .post(`/api/orgs/${orgId}/agents`)
       .set('Authorization', `Bearer ${managerToken}`)
-      .send({ name: 'New A', username: 'na', password: 'p', role: 'AGENT' })
+      .send({ name: 'New A', username: 'newagent', password: 'pwd', role: 'AGENT' })
     expect(res.status).toBe(201)
     newAgentId = res.body.id
   })
@@ -26,7 +27,7 @@ describe('Agent Routes', () => {
     const res = await request(app)
       .put(`/api/orgs/${orgId}/agents/${newAgentId}`)
       .set('Authorization', `Bearer ${managerToken}`)
-      .send({ name: 'Edited A', role: 'MANAGER' })
+      .send({ name: 'Edited A' })
     expect(res.status).toBe(200)
     expect(res.body.name).toBe('Edited A')
   })

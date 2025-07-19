@@ -1,11 +1,11 @@
-import { Router } from 'express'
-import auth from '../middleware/auth'
-import roles from '../middleware/roles'
-import { getMembers, addMember } from '../controllers/memberController'
+import { Router } from "express";
+import auth from "../middleware/auth";
+import roles from "../middleware/roles";
+import { getMembers, addMember } from "../controllers/memberController";
 
-const router = Router({ mergeParams: true })
+const router = Router({ mergeParams: true });
 
-router.get('/', auth, roles(['ADMIN', 'MANAGER']), getMembers)
-router.post('/', auth, roles(['ADMIN', 'MANAGER']), addMember)
+router.get("/", auth, roles(["ADMIN", "MANAGER"]), getMembers);
+router.post("/", auth, roles(["ADMIN", "MANAGER"]), addMember);
 
 export default router;

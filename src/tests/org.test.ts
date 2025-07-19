@@ -1,8 +1,9 @@
 import request from 'supertest'
-import app from '../app'
 import { adminToken, managerToken, agentToken, orgId } from './setup'
 
-describe('Organization Routes', () => {
+import app from "../app";
+
+describe('🏢 Organization Routes', () => {
   test('GET /api/orgs → 401 no token', async () => {
     const res = await request(app).get('/api/orgs')
     expect(res.status).toBe(401)
@@ -72,12 +73,11 @@ describe('Organization Routes', () => {
   })
 
   test('DELETE /api/orgs/:id → 200 ADMIN', async () => {
-    // create a throw-away org
-    const throwaway = await request(app)
+    const tmp = await request(app)
       .post('/api/orgs')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ name: 'ToDelete' })
-    const id = throwaway.body.id
+      .send({ name: 'Temp Org' })
+    const id = tmp.body.id
 
     const res = await request(app)
       .delete(`/api/orgs/${id}`)

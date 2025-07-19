@@ -1,8 +1,22 @@
 import request from 'supertest'
-import app from '../app'
-import { agentToken, orgId } from './setup'
+import { agentToken, managerToken, orgId } from './setup'
 
-describe('Member Validation', () => {
+import app from "../app";
+
+describe('🔎 Member Validation', () => {
+  test('POST /api/orgs/:orgId/members/validate → 401 no token', async () => {
+    const res = await request(app).post(`/api/orgs/${orgId}/members/validate`).send({})
+    expect(res.status).toBe(401)
+  })
+
+  test('POST /api/orgs/:orgId/members/validate → 403 as MANAGER', async () => {
+    const res = await request(app)
+      .post(`/api/orgs/${orgId}/members/validate`)
+      .set('Authorization', `Bearer ${managerToken}`)
+      .send({})
+    expect(res.status).toBe(403)
+  })
+
   test('POST /api/orgs/:orgId/members/validate → 200 valid:false', async () => {
     const res = await request(app)
       .post(`/api/orgs/${orgId}/members/validate`)

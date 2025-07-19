@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response, NextFunction } from "express";
 
 export default function agentModeGuard(
   req: Request,
@@ -8,7 +8,7 @@ export default function agentModeGuard(
   if (!req.user?.orgId) {
     return res
       .status(403)
-      .json({ message: 'This route is only for organization‐bound agents' })
+      .json({ message: "This route is only for organization‐bound agents" });
   }
-  next()
+  next();
 }

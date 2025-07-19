@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express'
-import { prisma } from '../config/db'
+import { Request, Response, NextFunction } from "express";
+import { prisma } from "../config/db";
 
 export const getAllOrgs = async (
   _req: Request,
@@ -9,14 +9,16 @@ export const getAllOrgs = async (
   try {
     const orgs = await prisma.organization.findMany({
       include: {
-        agents: { select: { id: true, name: true, username: true, role: true } }
-      }
-    })
-    res.json(orgs)
+        agents: {
+          select: { id: true, name: true, username: true, role: true },
+        },
+      },
+    });
+    res.json(orgs);
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 export const getOrgById = async (
   req: Request,
@@ -24,26 +26,26 @@ export const getOrgById = async (
   next: NextFunction
 ) => {
   try {
-    const { orgId } = req.params
+    const { orgId } = req.params;
     const org = await prisma.organization.findUnique({
       where: { id: orgId },
       include: {
         agents: {
-          select: { id: true, name: true, username: true, role: true }
+          select: { id: true, name: true, username: true, role: true },
         },
         members: true,
         actions: true,
         articles: true,
         closingItems: true,
-        callReasons: true
-      }
-    })
-    if (!org) return res.status(404).json({ error: 'Organization not found' })
-    res.json(org)
+        callReasons: true,
+      },
+    });
+    if (!org) return res.status(404).json({ error: "Organization not found" });
+    res.json(org);
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 export const createOrg = async (
   req: Request,
@@ -51,15 +53,15 @@ export const createOrg = async (
   next: NextFunction
 ) => {
   try {
-    const { name } = req.body
-    if (!name) return res.status(400).json({ error: 'Missing name' })
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ error: "Missing name" });
 
-    const org = await prisma.organization.create({ data: { name } })
-    res.status(201).json(org)
+    const org = await prisma.organization.create({ data: { name } });
+    res.status(201).json(org);
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 export const updateOrg = async (
   req: Request,
@@ -67,17 +69,17 @@ export const updateOrg = async (
   next: NextFunction
 ) => {
   try {
-    const { orgId } = req.params
-    const data = req.body
+    const { orgId } = req.params;
+    const data = req.body;
     const org = await prisma.organization.update({
       where: { id: orgId },
-      data
-    })
-    res.json(org)
+      data,
+    });
+    res.json(org);
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 export const deleteOrg = async (
   req: Request,
@@ -85,13 +87,13 @@ export const deleteOrg = async (
   next: NextFunction
 ) => {
   try {
-    const { orgId } = req.params
-    await prisma.organization.delete({ where: { id: orgId } })
-    res.json({ message: 'Organization deleted' })
+    const { orgId } = req.params;
+    await prisma.organization.delete({ where: { id: orgId } });
+    res.json({ message: "Organization deleted" });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 export const upgradeOrg = async (
   req: Request,
@@ -99,13 +101,13 @@ export const upgradeOrg = async (
   next: NextFunction
 ) => {
   try {
-    const { orgId } = req.params
+    const { orgId } = req.params;
     const org = await prisma.organization.update({
       where: { id: orgId },
-      data: { plan: 'PAID', agentLimit: 1000 }
-    })
-    res.json({ message: 'Upgraded to paid', org })
+      data: { plan: "PAID", agentLimit: 1000 },
+    });
+    res.json({ message: "Upgraded to paid", org });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};

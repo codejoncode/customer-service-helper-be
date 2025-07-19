@@ -16,7 +16,6 @@ import actionRouter from './routes/actionRoutes';
 import checklistRouter from './routes/checklistRoutes';
 import callRouter from './routes/callRoutes';
 import validationRouter from './routes/validationRoutes';
-import rateLimit from 'express-rate-limit';
 import { generalLimiter } from './middleware/rateLimiters';
 
 
