@@ -1,95 +1,95 @@
-import request from 'supertest'
-import { adminToken, managerToken, agentToken, orgId } from './setup'
+import request from "supertest";
+import { adminToken, managerToken, agentToken, orgId } from "./setup";
 
 import app from "../app";
 
-describe('🏢 Organization Routes', () => {
-  test('GET /api/orgs → 401 no token', async () => {
-    const res = await request(app).get('/api/orgs')
-    expect(res.status).toBe(401)
-  })
+describe("🏢 Organization Routes", () => {
+  test("GET /api/orgs → 401 no token", async () => {
+    const res = await request(app).get("/api/orgs");
+    expect(res.status).toBe(401);
+  });
 
-  test('GET /api/orgs → 403 AGENT', async () => {
+  test("GET /api/orgs → 403 AGENT", async () => {
     const res = await request(app)
-      .get('/api/orgs')
-      .set('Authorization', `Bearer ${agentToken}`)
-    expect(res.status).toBe(403)
-  })
+      .get("/api/orgs")
+      .set("Authorization", `Bearer ${agentToken}`);
+    expect(res.status).toBe(403);
+  });
 
-  test('GET /api/orgs → 200 ADMIN', async () => {
+  test("GET /api/orgs → 200 ADMIN", async () => {
     const res = await request(app)
-      .get('/api/orgs')
-      .set('Authorization', `Bearer ${adminToken}`)
-    expect(res.status).toBe(200)
-    expect(Array.isArray(res.body)).toBe(true)
-  })
+      .get("/api/orgs")
+      .set("Authorization", `Bearer ${adminToken}`);
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
 
-  test('POST /api/orgs → 403 MANAGER', async () => {
+  test("POST /api/orgs → 403 MANAGER", async () => {
     const res = await request(app)
-      .post('/api/orgs')
-      .set('Authorization', `Bearer ${managerToken}`)
-      .send({ name: 'X' })
-    expect(res.status).toBe(403)
-  })
+      .post("/api/orgs")
+      .set("Authorization", `Bearer ${managerToken}`)
+      .send({ name: "X" });
+    expect(res.status).toBe(403);
+  });
 
-  test('POST /api/orgs → 201 ADMIN', async () => {
+  test("POST /api/orgs → 201 ADMIN", async () => {
     const res = await request(app)
-      .post('/api/orgs')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ name: 'Another Org' })
-    expect(res.status).toBe(201)
-    expect(res.body.id).toBeDefined()
-  })
+      .post("/api/orgs")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send({ name: "Another Org" });
+    expect(res.status).toBe(201);
+    expect(res.body.id).toBeDefined();
+  });
 
-  test('GET /api/orgs/:id → 200 valid', async () => {
+  test("GET /api/orgs/:id → 200 valid", async () => {
     const res = await request(app)
       .get(`/api/orgs/${orgId}`)
-      .set('Authorization', `Bearer ${adminToken}`)
-    expect(res.status).toBe(200)
-    expect(res.body.id).toBe(orgId)
-  })
+      .set("Authorization", `Bearer ${adminToken}`);
+    expect(res.status).toBe(200);
+    expect(res.body.id).toBe(orgId);
+  });
 
-  test('GET /api/orgs/invalid → 404', async () => {
+  test("GET /api/orgs/invalid → 404", async () => {
     const res = await request(app)
-      .get('/api/orgs/invalid')
-      .set('Authorization', `Bearer ${adminToken}`)
-    expect(res.status).toBe(404)
-  })
+      .get("/api/orgs/invalid")
+      .set("Authorization", `Bearer ${adminToken}`);
+    expect(res.status).toBe(404);
+  });
 
-  test('PUT /api/orgs/:id → 200 MANAGER', async () => {
+  test("PUT /api/orgs/:id → 200 MANAGER", async () => {
     const res = await request(app)
       .put(`/api/orgs/${orgId}`)
-      .set('Authorization', `Bearer ${managerToken}`)
-      .send({ name: 'Updated Org' })
-    expect(res.status).toBe(200)
-    expect(res.body.name).toBe('Updated Org')
-  })
+      .set("Authorization", `Bearer ${managerToken}`)
+      .send({ name: "Updated Org" });
+    expect(res.status).toBe(200);
+    expect(res.body.name).toBe("Updated Org");
+  });
 
-  test('DELETE /api/orgs/:id → 403 MANAGER', async () => {
+  test("DELETE /api/orgs/:id → 403 MANAGER", async () => {
     const res = await request(app)
       .delete(`/api/orgs/${orgId}`)
-      .set('Authorization', `Bearer ${managerToken}`)
-    expect(res.status).toBe(403)
-  })
+      .set("Authorization", `Bearer ${managerToken}`);
+    expect(res.status).toBe(403);
+  });
 
-  test('DELETE /api/orgs/:id → 200 ADMIN', async () => {
+  test("DELETE /api/orgs/:id → 200 ADMIN", async () => {
     const tmp = await request(app)
-      .post('/api/orgs')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ name: 'Temp Org' })
-    const id = tmp.body.id
+      .post("/api/orgs")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send({ name: "Temp Org" });
+    const id = tmp.body.id;
 
     const res = await request(app)
       .delete(`/api/orgs/${id}`)
-      .set('Authorization', `Bearer ${adminToken}`)
-    expect(res.status).toBe(200)
-  })
+      .set("Authorization", `Bearer ${adminToken}`);
+    expect(res.status).toBe(200);
+  });
 
-  test('POST /api/orgs/:id/upgrade → 200 ADMIN', async () => {
+  test("POST /api/orgs/:id/upgrade → 200 ADMIN", async () => {
     const res = await request(app)
       .post(`/api/orgs/${orgId}/upgrade`)
-      .set('Authorization', `Bearer ${adminToken}`)
-    expect(res.status).toBe(200)
-    expect(res.body.plan).toBe('PAID')
-  })
-})
+      .set("Authorization", `Bearer ${adminToken}`);
+    expect(res.status).toBe(200);
+    expect(res.body.plan).toBe("PAID");
+  });
+});

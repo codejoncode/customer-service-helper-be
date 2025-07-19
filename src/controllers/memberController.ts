@@ -1,3 +1,5 @@
+// src/controllers/memberController.ts
+
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../config/db";
 
@@ -22,11 +24,25 @@ export const addMember = async (
   res: Response,
   next: NextFunction
 ) => {
-  try {
-    const { orgId } = req.params;
-    const { memberId, name, dob, phone, streetAddress, city, state, zipcode } =
-      req.body;
+  const { orgId } = req.params;
+  const { memberId, name, dob, phone, streetAddress, city, state, zipcode } =
+    req.body;
 
+  // 400 if any required field is missing
+  if (
+    !memberId ||
+    !name ||
+    !dob ||
+    !phone ||
+    !streetAddress ||
+    !city ||
+    !state ||
+    !zipcode
+  ) {
+    return res.status(400).json({ message: "Missing fields" });
+  }
+
+  try {
     const member = await prisma.member.create({
       data: {
         memberId,
@@ -40,7 +56,6 @@ export const addMember = async (
         orgId,
       },
     });
-
     res.status(201).json(member);
   } catch (err) {
     next(err);
@@ -60,23 +75,28 @@ export const validateMember = async (
       where: { id: orgId },
       select: { validationFields: true },
     });
-
     if (!org) {
       return res.status(404).json({ message: "Organization not found" });
     }
 
-    // Build dynamic filter based on validationFields
-    const filters: Record<string, any> = { orgId };
-    for (const field of org.validationFields) {
-      if (req.body[field]) {
-        filters[field] = req.body[field];
-      }
+    // only look at the org's validationFields
+    const provided = org.validationFields.filter(
+      (field) => req.body[field] !== undefined && req.body[field] !== ""
+    );
+
+    // no validation inputs → automatically invalid
+    if (provided.length === 0) {
+      return res.json({ valid: false });
     }
 
-    const matchCount = await prisma.member.count({ where: filters });
-    const valid = matchCount > 0;
+    // build filters from provided fields
+    const filters: Record<string, any> = { orgId };
+    for (const field of provided) {
+      filters[field] = req.body[field];
+    }
 
-    res.json({ valid });
+    const count = await prisma.member.count({ where: filters });
+    res.json({ valid: count > 0 });
   } catch (err) {
     next(err);
   }

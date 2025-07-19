@@ -1,3 +1,4 @@
+// src/controllers/authController.ts
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -10,12 +11,14 @@ export const register = async (
   res: Response,
   next: NextFunction
 ) => {
-  try {
-    const { orgName, adminName, username, password } = req.body;
-    if (!orgName || !adminName || !username || !password) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
+  const { orgName, adminName, username, password } = req.body;
 
+  // 400 if any required field is missing
+  if (!orgName || !adminName || !username || !password) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  try {
     // create organization
     const org = await prisma.organization.create({
       data: { name: orgName },
@@ -40,7 +43,7 @@ export const register = async (
       { expiresIn: "8h" }
     );
 
-    res.json({ token });
+    return res.json({ token });
   } catch (err) {
     next(err);
   }
@@ -51,20 +54,22 @@ export const login = async (
   res: Response,
   next: NextFunction
 ) => {
-  try {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ error: "Missing credentials" });
-    }
+  const { username, password } = req.body;
 
+  // 400 if missing credentials
+  if (!username || !password) {
+    return res.status(400).json({ message: "Missing credentials" });
+  }
+
+  try {
     const agent = await prisma.agent.findUnique({ where: { username } });
     if (!agent) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const valid = await bcrypt.compare(password, agent.passwordHash);
     if (!valid) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const token = jwt.sign(
@@ -73,7 +78,7 @@ export const login = async (
       { expiresIn: "8h" }
     );
 
-    res.json({ token });
+    return res.json({ token });
   } catch (err) {
     next(err);
   }

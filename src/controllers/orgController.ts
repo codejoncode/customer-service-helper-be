@@ -1,8 +1,11 @@
+// src/controllers/orgController.ts
+
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../config/db";
 
+// GET /api/orgs
 export const getAllOrgs = async (
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -14,12 +17,13 @@ export const getAllOrgs = async (
         },
       },
     });
-    res.json(orgs);
+    return res.json(orgs);
   } catch (err) {
     next(err);
   }
 };
 
+// GET /api/orgs/:orgId
 export const getOrgById = async (
   req: Request,
   res: Response,
@@ -40,29 +44,38 @@ export const getOrgById = async (
         callReasons: true,
       },
     });
-    if (!org) return res.status(404).json({ error: "Organization not found" });
-    res.json(org);
+
+    if (!org) {
+      return res.status(404).json({ message: "Organization not found" });
+    }
+
+    return res.json(org);
   } catch (err) {
     next(err);
   }
 };
 
+// POST /api/orgs
 export const createOrg = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  try {
-    const { name } = req.body;
-    if (!name) return res.status(400).json({ error: "Missing name" });
+  const { name } = req.body;
 
+  if (!name) {
+    return res.status(400).json({ message: "Missing name" });
+  }
+
+  try {
     const org = await prisma.organization.create({ data: { name } });
-    res.status(201).json(org);
+    return res.status(201).json(org);
   } catch (err) {
     next(err);
   }
 };
 
+// PUT /api/orgs/:orgId
 export const updateOrg = async (
   req: Request,
   res: Response,
@@ -75,12 +88,13 @@ export const updateOrg = async (
       where: { id: orgId },
       data,
     });
-    res.json(org);
+    return res.json(org);
   } catch (err) {
     next(err);
   }
 };
 
+// DELETE /api/orgs/:orgId
 export const deleteOrg = async (
   req: Request,
   res: Response,
@@ -89,12 +103,13 @@ export const deleteOrg = async (
   try {
     const { orgId } = req.params;
     await prisma.organization.delete({ where: { id: orgId } });
-    res.json({ message: "Organization deleted" });
+    return res.json({ message: "Organization deleted" });
   } catch (err) {
     next(err);
   }
 };
 
+// POST /api/orgs/:orgId/upgrade
 export const upgradeOrg = async (
   req: Request,
   res: Response,
@@ -106,7 +121,8 @@ export const upgradeOrg = async (
       where: { id: orgId },
       data: { plan: "PAID", agentLimit: 1000 },
     });
-    res.json({ message: "Upgraded to paid", org });
+    // Return the updated org directly so tests can read res.body.plan
+    return res.json(org);
   } catch (err) {
     next(err);
   }
