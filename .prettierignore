@@ -1,0 +1,20 @@
+# Ignore build artifacts and dependencies
+node_modules
+dist
+build
+
+# Skip env and config files
+.env
+.env.test
+
+# Skip database files
+*.db
+
+# Skip generated Prisma client (optional if you want to keep formatting)
+prisma/generated/
+
+# Skip compiled JavaScript
+*.js
+
+# Skip coverage output
+coverage

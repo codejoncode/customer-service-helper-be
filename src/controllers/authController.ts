@@ -11,7 +11,7 @@ export const register = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { orgName, adminName, username, password } = req.body;
+  const { orgName, adminName, username, password, email } = req.body;
 
   // 400 if any required field is missing
   if (!orgName || !adminName || !username || !password) {
@@ -29,10 +29,13 @@ export const register = async (
     const agent = await prisma.agent.create({
       data: {
         name: adminName,
+        email,
         username,
         passwordHash: hash,
         role: "ADMIN",
-        orgId: org.id,
+        organization: {
+          connect: { id: org.id },
+        },
       },
     });
 

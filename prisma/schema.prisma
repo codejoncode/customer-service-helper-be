@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,40 +8,37 @@ datasource db {
 }
 
 model Organization {
-  id               String   @id @default(cuid())
+  id               String        @id @default(cuid())
   name             String
-  plan             Plan     @default(FREE)
-  agentLimit       Int      @default(3)
-  validationFields String[] @default([])
-
-  agents       Agent[]
-  members      Member[]
-  actions      Action[]
-  articles     Article[]
-  closingItems ClosingItem[]
-  callReasons  CallReason[]
-  callLogs     CallLog[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  plan             Plan          @default(FREE)
+  agentLimit       Int           @default(3)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  validationFields String[]      @default([])
+  actions          Action[]
+  agents           Agent[]
+  articles         Article[]
+  callLogs         CallLog[]
+  callReasons      CallReason[]
+  closingItems     ClosingItem[]
+  members          Member[]
 }
 
 model Agent {
-  id           String @id @default(cuid())
+  id           String        @id @default(cuid())
   name         String
-  username     String @unique
+  username     String        @unique
   passwordHash String
-  role         Role   @default(AGENT)
-
+  role         Role          @default(AGENT)
   orgId        String?
+  email        String        @unique
   organization Organization? @relation(fields: [orgId], references: [id])
-
-  callLogs CallLog[]
+  callLogs     CallLog[]
 }
 
 model Member {
-  id            String @id @default(cuid())
-  memberId      String @unique
+  id            String       @id @default(cuid())
+  memberId      String       @unique
   name          String
   dob           String
   phone         String
@@ -55,82 +46,67 @@ model Member {
   city          String
   state         String
   zipcode       String
-
-  orgId        String
-  organization Organization @relation(fields: [orgId], references: [id])
-
-  callLogs CallLog[]
+  orgId         String
+  callLogs      CallLog[]
+  organization  Organization @relation(fields: [orgId], references: [id])
 }
 
 model Action {
-  id               String  @id @default(cuid())
+  id               String       @id @default(cuid())
   label            String
   defaultArticleId String?
-  callReasonId     String
   orgId            String
-
-  organization   Organization @relation(fields: [orgId], references: [id])
-  callReason     CallReason   @relation(fields: [callReasonId], references: [id])
-  defaultArticle Article?     @relation(fields: [defaultArticleId], references: [id])
+  callReasonId     String
+  callReason       CallReason   @relation(fields: [callReasonId], references: [id])
+  defaultArticle   Article?     @relation(fields: [defaultArticleId], references: [id])
+  organization     Organization @relation(fields: [orgId], references: [id])
 }
 
 model Article {
-  id          String   @id @default(cuid())
-  reason      String
-  required    String[]
-  template    String
-  url         String
-  fullArticle String
-
+  id           String       @id @default(cuid())
+  reason       String
+  required     String[]
+  template     String
+  url          String
+  fullArticle  String
   orgId        String
+  actions      Action[]
   organization Organization @relation(fields: [orgId], references: [id])
-
-  callLogs CallLog[]
-  actions  Action[]
+  callLogs     CallLog[]
 }
 
 model ClosingItem {
-  id    String @id @default(cuid())
-  label String
-
+  id           String       @id @default(cuid())
+  label        String
   orgId        String
   organization Organization @relation(fields: [orgId], references: [id])
 }
 
 model CallReason {
-  id    String @id @default(cuid())
-  label String
-
+  id           String       @id @default(cuid())
+  label        String
   orgId        String
+  actions      Action[]
+  callLogs     CallLog[]
   organization Organization @relation(fields: [orgId], references: [id])
-
-  callLogs CallLog[]
-  actions  Action[]
 }
 
 model CallLog {
-  id String @id @default(cuid())
-
-  orgId String
-  org   Organization @relation(fields: [orgId], references: [id])
-
-  agentId String
-  agent   Agent  @relation(fields: [agentId], references: [id])
-
-  memberId String
-  member   Member @relation(fields: [memberId], references: [id])
-
-  reasonId   String
-  callReason CallReason @relation(fields: [reasonId], references: [id])
-
-  articleId String
-  article   Article @relation(fields: [articleId], references: [id])
-
+  id               String       @id @default(cuid())
+  orgId            String
+  agentId          String
+  memberId         String
+  reasonId         String
+  articleId        String
   actionsTaken     String[]
   closingChecklist String[]
   notes            String
-
-  createdAt DateTime @default(now())
+  createdAt        DateTime     @default(now())
+  agent            Agent        @relation(fields: [agentId], references: [id])
+  article          Article      @relation(fields: [articleId], references: [id])
+  member           Member       @relation(fields: [memberId], references: [id])
+  org              Organization @relation(fields: [orgId], references: [id])
+  callReason       CallReason   @relation(fields: [reasonId], references: [id])
 }
 
 enum Role {

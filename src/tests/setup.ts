@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import request from "supertest";
+import { Prisma } from "@prisma/client";
 import { prisma } from "../config/db";
 import {
   generateTestJWT,
@@ -21,7 +22,7 @@ export let checklistId: string;
 export let memberId: string;
 
 beforeAll(async () => {
-  // Clean slate
+  // 0) Clean slate
   await prisma.callLog.deleteMany();
   await prisma.action.deleteMany();
   await prisma.closingItem.deleteMany();
@@ -31,9 +32,13 @@ beforeAll(async () => {
   await prisma.agent.deleteMany();
   await prisma.organization.deleteMany();
 
-  // 1) Create an org with PAID plan and 2-field validation
+  // 1) Create an org
   const org = await prisma.organization.create({
-    data: { name: "Test Org", plan: "PAID", validationFields: ["name", "dob"] },
+    data: {
+      name: "Test Org",
+      plan: "PAID",
+      validationFields: ["name", "dob"],
+    },
   });
   orgId = org.id;
 
@@ -61,8 +66,8 @@ beforeAll(async () => {
     data: {
       label: reason.label,
       defaultArticleId: articleId,
-      orgId,
       callReasonId: reasonId,
+      orgId,
     },
   });
   actionId = action.id;
@@ -89,42 +94,42 @@ beforeAll(async () => {
   });
   memberId = member.id;
 
-  // 7) Create admin, manager, agent
+  // 7) Create agents
   const hash = await bcrypt.hash("P@ssw0rd", 10);
+
+  // Helper inside beforeAll so it can see `hash` and `orgId`
+  async function createAgent(
+    overrides: Partial<Prisma.AgentCreateInput>,
+    role: TestRole
+  ) {
+    const base: Prisma.AgentCreateInput = {
+      name: role,
+      email: `${role.toLowerCase()}@example.com`,
+      username: overrides.username ?? role.toLowerCase(),
+      passwordHash: hash,
+      role,
+      organization: {
+        connect: {id: orgId}
+      },
+    };
+    return prisma.agent.create({ data: { ...base, ...overrides } });
+  }
+
   const [admin, manager, agent] = await Promise.all([
-    prisma.agent.create({
-      data: {
-        name: "Admin",
-        username: "admin",
-        passwordHash: hash,
-        role: "ADMIN",
-        orgId,
-      },
-    }),
-    prisma.agent.create({
-      data: {
-        name: "Manager",
-        username: "manager",
-        passwordHash: hash,
-        role: "MANAGER",
-        orgId,
-      },
-    }),
-    prisma.agent.create({
-      data: {
-        name: "Agent",
-        username: "agent",
-        passwordHash: hash,
-        role: "AGENT",
-        orgId,
-      },
-    }),
+    createAgent({ username: "admin" }, "ADMIN"),
+    createAgent({ username: "manager" }, "MANAGER"),
+    createAgent({ username: "agent" }, "AGENT"),
   ]);
 
-  const makeToken = (u: typeof admin, role: TestRole) => {
-    const payload: TestUserPayload = { userId: u.id, orgId: u.orgId!, role };
+  // 8) Generate JWTs
+  function makeToken(u: typeof admin, role: TestRole) {
+    const payload: TestUserPayload = {
+      userId: u.id,
+      orgId: u.orgId!,
+      role,
+    };
     return generateTestJWT(payload);
-  };
+  }
 
   adminToken = makeToken(admin, "ADMIN");
   managerToken = makeToken(manager, "MANAGER");

@@ -1,46 +1,46 @@
-import request from "supertest";
-import { adminToken, managerToken, orgId } from "./setup";
+import request from 'supertest';
+import { adminToken, managerToken, orgId } from './setup';
+import app from '../app';
 
-import app from "../app";
-
-describe("👥 Agent Routes", () => {
+describe('👥 Agent Routes', () => {
   let newAgentId: string;
 
-  test("GET /api/orgs/:orgId/agents → 200 MANAGER", async () => {
+  test('GET /api/orgs/:orgId/agents → 200 MANAGER', async () => {
     const res = await request(app)
       .get(`/api/orgs/${orgId}/agents`)
-      .set("Authorization", `Bearer ${managerToken}`);
+      .set('Authorization', `Bearer ${managerToken}`);
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
 
-  test("POST /api/orgs/:orgId/agents → 201 MANAGER", async () => {
+  test('POST /api/orgs/:orgId/agents → 201 MANAGER', async () => {
     const res = await request(app)
       .post(`/api/orgs/${orgId}/agents`)
-      .set("Authorization", `Bearer ${managerToken}`)
+      .set('Authorization', `Bearer ${managerToken}`)
       .send({
-        name: "New A",
-        username: "newagent",
-        password: "pwd",
-        role: "AGENT",
+        name: 'New A',
+        username: 'newagent',
+        password: 'pwd',
+        role: 'AGENT',
+        email: 'newagent@example.com', // ✅ Added email
       });
     expect(res.status).toBe(201);
     newAgentId = res.body.id;
   });
 
-  test("PUT /api/orgs/:orgId/agents/:agentId → 200 MANAGER", async () => {
+  test('PUT /api/orgs/:orgId/agents/:agentId → 200 MANAGER', async () => {
     const res = await request(app)
       .put(`/api/orgs/${orgId}/agents/${newAgentId}`)
-      .set("Authorization", `Bearer ${managerToken}`)
-      .send({ name: "Edited A" });
+      .set('Authorization', `Bearer ${managerToken}`)
+      .send({ name: 'Edited A' });
     expect(res.status).toBe(200);
-    expect(res.body.name).toBe("Edited A");
+    expect(res.body.name).toBe('Edited A');
   });
 
-  test("DELETE /api/orgs/:orgId/agents/:agentId → 200 ADMIN", async () => {
+  test('DELETE /api/orgs/:orgId/agents/:agentId → 200 ADMIN', async () => {
     const res = await request(app)
       .delete(`/api/orgs/${orgId}/agents/${newAgentId}`)
-      .set("Authorization", `Bearer ${adminToken}`);
+      .set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
   });
 });

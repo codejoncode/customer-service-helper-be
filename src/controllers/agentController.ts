@@ -31,7 +31,7 @@ export const addAgent = async (
   next: NextFunction
 ) => {
   const { orgId } = req.params;
-  const { name, username, password, role } = req.body;
+  const { name, username, password, role, email } = req.body;
 
   // 400 when missing data
   if (!name || !username || !password || !role) {
@@ -57,7 +57,7 @@ export const addAgent = async (
     // hash & create
     const hash = await bcrypt.hash(password, SALT_ROUNDS);
     const agent = await prisma.agent.create({
-      data: { name, username, passwordHash: hash, role, orgId },
+      data: { name, email, username, passwordHash: hash, role, organization: {connect : {id : orgId }}},
       select: { id: true, name: true, username: true, role: true },
     });
 
