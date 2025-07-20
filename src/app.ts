@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { PrismaClient } from '@prisma/client';
+import { globalInputValidator } from './middleware/globalValidation';
 
 // ---- Routers ----
 import authRouter from './routes/authRoutes';
@@ -33,6 +34,7 @@ app.use(
   }),
 );
 app.use(express.json()); // Parse JSON bodies
+// app.use(globalInputValidator);
 app.use(generalLimiter);
 
 // ---- Health Check Endpoint ----
