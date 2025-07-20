@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 // router.get('/members', authenticateJWT, authorizeRoles(['admin', 'manager']), listMembersHandler);
-// router.post('/members', authenticateJWT, authorizeRoles(['admin', 'manager']), createMemberHandler);
+// router.post('/members', authenticateJWT, authorizeRoles(['admin', 'manager']), validateMemberInput, createMemberHandler);
 /**
  * Role‐based guard middleware.
  * @param allowedRoles - array of role names (e.g. ['ADMIN','MANAGER'])

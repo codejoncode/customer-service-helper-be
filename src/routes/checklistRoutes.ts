@@ -8,13 +8,14 @@ import {
   updateChecklist,
   deleteChecklist,
 } from '../controllers/checklistController';
+import validateMemberInput from '../middleware/validateMemberInput';
 
 const router = Router({ mergeParams: true });
 
 router.get('/', auth, roles(['ADMIN', 'MANAGER']), getChecklists);
 router.get('/:id', auth, roles(['ADMIN', 'MANAGER']), getChecklistById);
-router.post('/', auth, roles(['ADMIN', 'MANAGER']), createChecklist);
-router.put('/:id', auth, roles(['ADMIN', 'MANAGER']), updateChecklist);
+router.post('/', auth, roles(['ADMIN', 'MANAGER']), validateMemberInput, createChecklist);
+router.put('/:id', auth, roles(['ADMIN', 'MANAGER']), validateMemberInput, updateChecklist);
 router.delete('/:id', auth, roles(['ADMIN', 'MANAGER']), deleteChecklist);
 
 export default router;
