@@ -25,30 +25,32 @@ model Organization {
 }
 
 model Agent {
-  id           String        @id @default(cuid())
-  name         String
-  username     String        @unique
-  passwordHash String
-  role         Role          @default(AGENT)
-  orgId        String?
-  email        String        @unique
-  organization Organization? @relation(fields: [orgId], references: [id])
-  callLogs     CallLog[]
+  id             String                @id @default(cuid())
+  name           String
+  username       String                @unique
+  passwordHash   String
+  role           Role                  @default(AGENT)
+  orgId          String?
+  email          String                @unique
+  organization   Organization?         @relation(fields: [orgId], references: [id])
+  callLogs       CallLog[]
+  validationLogs MemberValidationLog[]
 }
 
 model Member {
-  id            String       @id @default(cuid())
-  memberId      String       @unique
-  name          String
-  dob           String
-  phone         String
-  streetAddress String
-  city          String
-  state         String
-  zipcode       String
-  orgId         String
-  callLogs      CallLog[]
-  organization  Organization @relation(fields: [orgId], references: [id])
+  id             String                @id @default(cuid())
+  memberId       String                @unique
+  name           String
+  dob            String
+  phone          String
+  streetAddress  String
+  city           String
+  state          String
+  zipcode        String
+  orgId          String
+  callLogs       CallLog[]
+  organization   Organization          @relation(fields: [orgId], references: [id])
+  validationLogs MemberValidationLog[]
 }
 
 model Action {
@@ -98,8 +100,8 @@ model CallLog {
   memberId         String
   reasonId         String
   articleId        String
-  actionsTaken     String[]
-  closingChecklist String[]
+  actionsTaken     String[]     @db.Text
+  closingChecklist String[]     @db.Text
   notes            String
   createdAt        DateTime     @default(now())
   agent            Agent        @relation(fields: [agentId], references: [id])
@@ -107,6 +109,46 @@ model CallLog {
   member           Member       @relation(fields: [memberId], references: [id])
   org              Organization @relation(fields: [orgId], references: [id])
   callReason       CallReason   @relation(fields: [reasonId], references: [id])
+  callSummary      CallSummary?
+}
+
+model FAQ {
+  id        Int      @id @default(autoincrement())
+  question  String
+  answer    String
+  tags      String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String // could be a user ID, agent username, or email
+}
+
+model CallSummary {
+  id           Int      @id @default(autoincrement())
+  callLogId    String   @unique
+  orgId        String
+  summaryText  String
+  actionsTaken String[]
+  notes        String
+  checklist    String[]
+  createdBy    String
+  createdAt    DateTime @default(now())
+  callLog      CallLog  @relation(fields: [callLogId], references: [id], onDelete: Cascade)
+}
+
+model MemberValidationLog {
+  id            String   @id @default(cuid())
+  orgId         String
+  memberId      String
+  providedData  Json
+  results       Json
+  valid         Boolean
+  createdBy     String
+  createdAt     DateTime @default(now())
+  member        Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  agentId       String
+  fieldsChecked String[]
+  passed        Boolean
+  agent         Agent    @relation(fields: [agentId], references: [id])
 }
 
 enum Role {

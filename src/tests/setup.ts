@@ -4,6 +4,7 @@ import { prisma } from '../config/db';
 import { generateTestJWT, TestRole, TestUserPayload } from './utils/generateToken';
 
 jest.setTimeout(30000);
+export const seededMemberId = 'M123'; // Replace with actual ID from seed
 
 export let adminToken: string;
 export let managerToken: string;
@@ -14,9 +15,13 @@ export let articleId: string;
 export let actionId: string;
 export let checklistId: string;
 export let memberId: string;
+export let callLogId: string;
+export let callSummaryId: number;
+export let managerUserId: string;
 
 beforeAll(async () => {
   // 0) Clean slate
+  await prisma.callSummary.deleteMany();
   await prisma.callLog.deleteMany();
   await prisma.action.deleteMany();
   await prisma.closingItem.deleteMany();
@@ -90,8 +95,6 @@ beforeAll(async () => {
 
   // 7) Create agents
   const hash = await bcrypt.hash('P@ssw0rd', 10);
-
-  // Helper inside beforeAll so it can see `hash` and `orgId`
   async function createAgent(overrides: Partial<Prisma.AgentCreateInput>, role: TestRole) {
     const base: Prisma.AgentCreateInput = {
       name: role,
@@ -112,6 +115,8 @@ beforeAll(async () => {
     createAgent({ username: 'agent' }, 'AGENT'),
   ]);
 
+  managerUserId = manager.id;
+
   // 8) Generate JWTs
   function makeToken(u: typeof admin, role: TestRole) {
     const payload: TestUserPayload = {
@@ -125,6 +130,21 @@ beforeAll(async () => {
   adminToken = makeToken(admin, 'ADMIN');
   managerToken = makeToken(manager, 'MANAGER');
   agentToken = makeToken(agent, 'AGENT');
+
+  // 9) Seed a call log (single one used by all tests)
+  const callLog = await prisma.callLog.create({
+    data: {
+      orgId,
+      agentId: agent.id,
+      memberId,
+      reasonId,
+      articleId,
+      actionsTaken: ['Explained billing page', 'Reset password'],
+      closingChecklist: ['Confirmed login success'],
+      notes: 'difficulty logging',
+    },
+  });
+  callLogId = callLog.id;
 });
 
 afterAll(async () => {

@@ -17,6 +17,9 @@ import checklistRouter from './routes/checklistRoutes';
 import callRouter from './routes/callRoutes';
 import validationRouter from './routes/validationRoutes';
 import { generalLimiter } from './middleware/rateLimiters';
+import faqRoutes from './routes/faqRoutes';
+import authMiddleware from './middleware/authMiddleware';
+import callSummaryRoutes from './routes/callSummaryRoutes';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -59,6 +62,11 @@ app.use('/api/orgs/:orgId/actions', actionRouter);
 app.use('/api/orgs/:orgId/checklists', checklistRouter);
 app.use('/api/orgs/:orgId/calls', callRouter);
 app.use('/api/orgs/:orgId/validation-rules', validationRouter);
+
+// prebuilt agent routes
+app.use(authMiddleware);
+app.use('/api/orgs/:orgId/faqs', faqRoutes);
+app.use('/api/orgs/:orgId/call-summaries', callSummaryRoutes);
 
 // ---- Global Error Handler ----
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any

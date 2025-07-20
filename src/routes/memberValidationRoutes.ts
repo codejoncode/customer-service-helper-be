@@ -1,3 +1,4 @@
+// src/routes/memberValidationRoutes.ts
 import { Router } from 'express';
 import auth from '../middleware/auth';
 import roles from '../middleware/roles';
@@ -8,7 +9,7 @@ import allowIfTrainingOrAgent from '../middleware/allowIfTrainingOrAgent';
 const router = Router({ mergeParams: true });
 
 router.post(
-  '/validate',
+  '/:memberId/validate',
   auth,
   roles(['AGENT', 'MANAGER', 'ADMIN']),
   allowIfTrainingOrAgent,
