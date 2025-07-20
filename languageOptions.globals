@@ -1,0 +1,27 @@
+import globals from 'globals'; // <-- Install this if needed
+
+export default [
+  // other config blocks...
+  {
+    files: ['**/*.test.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        sourceType: 'module',
+        ecmaVersion: 'latest',
+      },
+      globals: {
+        ...globals.jest,
+      },
+    },
+    plugins: {
+      jest: jestPlugin,
+    },
+    rules: {
+      'jest/no-disabled-tests': 'warn',
+      'jest/no-focused-tests': 'error',
+      'jest/no-identical-title': 'error',
+      'jest/valid-expect': 'error',
+    },
+  },
+];

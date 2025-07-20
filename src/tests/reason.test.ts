@@ -9,6 +9,7 @@ describe("📋 Reason & Article Lookup", () => {
       .get(`/api/orgs/${orgId}/reasons`)
       .set("Authorization", `Bearer ${agentToken}`);
     expect(res.status).toBe(200);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(res.body.some((r: any) => r.id === reasonId)).toBe(true);
   });
 
@@ -17,6 +18,7 @@ describe("📋 Reason & Article Lookup", () => {
       .get(`/api/orgs/${orgId}/reasons/${reasonId}/articles`)
       .set("Authorization", `Bearer ${agentToken}`);
     expect(res.status).toBe(200);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(res.body.some((a: any) => a.id === articleId)).toBe(true);
   });
 });

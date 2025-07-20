@@ -49,6 +49,7 @@ export const createCall = async (
 };
 
 export const generateCallNotes = (req: Request, res: Response) => {
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   const { memberId, reason, articleTitle, actionsTaken, closingChecklist } =
     req.body;
 

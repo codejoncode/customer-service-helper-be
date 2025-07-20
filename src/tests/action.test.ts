@@ -25,6 +25,7 @@ describe("🔁 Action Mapping Routes", () => {
       .get(`/api/orgs/${orgId}/actions`)
       .set("Authorization", `Bearer ${managerToken}`);
     expect(res.status).toBe(200);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(res.body.some((a: any) => a.id === actionId)).toBe(true);
   });
 

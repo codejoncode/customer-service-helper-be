@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import request from "supertest";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../config/db";
 import {
@@ -7,7 +6,7 @@ import {
   TestRole,
   TestUserPayload,
 } from "./utils/generateToken";
-import app from "../app";
+
 
 jest.setTimeout(30000);
 

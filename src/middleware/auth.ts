@@ -50,6 +50,7 @@ export default async function auth(
       role: payload.role as Role,
     };
     return next();
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   } catch (err) {
     return res.status(401).json({ error: "Unauthorized" });
   }

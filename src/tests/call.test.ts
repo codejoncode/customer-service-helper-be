@@ -6,6 +6,7 @@ import app from "../app";
 
 describe("📞 Call Logging & Notes", () => {
   let agentUserId: string;
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   let callLogId: string;
 
   beforeAll(() => {

@@ -90,6 +90,7 @@ export const validateMember = async (
     }
 
     // build filters from provided fields
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filters: Record<string, any> = { orgId };
     for (const field of provided) {
       filters[field] = req.body[field];

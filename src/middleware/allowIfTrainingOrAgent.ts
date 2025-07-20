@@ -5,6 +5,7 @@ import { Role } from "@prisma/client";
 
 const allowIfTrainingOrAgent: RequestHandler = (req, res, next) => {
   // grab the user object your auth middleware attached
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const user = (req as any).user as {
     userId: string;
     orgId: string;

@@ -63,6 +63,7 @@ app.use('/api/orgs/:orgId/calls', callRouter);
 app.use('/api/orgs/:orgId/validation-rules', validationRouter);
 
 // ---- Global Error Handler ----
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error('Unhandled Error:', err);
   res.status(500).json({ error: err.message || 'Internal Server Error' });

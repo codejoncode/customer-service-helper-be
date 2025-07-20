@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { Role } from "../types/Role";
 
 // router.get('/members', authenticateJWT, authorizeRoles(['admin', 'manager']), listMembersHandler);
 // router.post('/members', authenticateJWT, authorizeRoles(['admin', 'manager']), createMemberHandler);
