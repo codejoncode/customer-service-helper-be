@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import { Role } from "../types/Role";
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { Role } from '../types/Role';
 
 // augment Express Request to include `user`
 declare global {
@@ -9,39 +9,35 @@ declare global {
       user?: {
         userId: string;
         orgId: string;
-        role: "ADMIN" | "MANAGER" | "AGENT";
+        role: 'ADMIN' | 'MANAGER' | 'AGENT';
       };
     }
   }
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
 /**
  * Verifies the JWT from the Authorization header
  * and attaches `user` to req
  */
-export default async function auth(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+export default async function auth(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "No token provided" });
+  if (!authHeader?.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'No token provided' });
   }
 
   try {
-    const token = authHeader.split(" ")[1];
+    const token = authHeader.split(' ')[1];
     const payload = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
 
     // ensure we have the expected fields
     if (
-      typeof payload.userId !== "string" ||
-      typeof payload.orgId !== "string" ||
-      typeof payload.role !== "string"
+      typeof payload.userId !== 'string' ||
+      typeof payload.orgId !== 'string' ||
+      typeof payload.role !== 'string'
     ) {
-      throw new Error("Invalid token payload");
+      throw new Error('Invalid token payload');
     }
 
     req.user = {
@@ -50,8 +46,8 @@ export default async function auth(
       role: payload.role as Role,
     };
     return next();
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   } catch (err) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 }

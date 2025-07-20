@@ -1,11 +1,7 @@
-import { Request, Response, NextFunction } from "express";
-import { prisma } from "../config/db";
+import { Request, Response, NextFunction } from 'express';
+import { prisma } from '../config/db';
 
-export const getActions = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getActions = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { orgId } = req.params;
     const actions = await prisma.action.findMany({ where: { orgId } });
@@ -15,30 +11,21 @@ export const getActions = async (
   }
 };
 
-export const getActionById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getActionById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const action = await prisma.action.findUnique({ where: { id } });
-    if (!action) return res.status(404).json({ message: "Not found" });
+    if (!action) return res.status(404).json({ message: 'Not found' });
     res.json(action);
   } catch (err) {
     next(err);
   }
 };
 
-export const createOrUpdateMapping = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const createOrUpdateMapping = async (req: Request, res: Response): Promise<Response> => {
   const { reasonId, articleId } = req.body;
   if (!reasonId || !articleId) {
-    return res
-      .status(400)
-      .json({ message: "reasonId and articleId are required" });
+    return res.status(400).json({ message: 'reasonId and articleId are required' });
   }
 
   // verify existence
@@ -47,7 +34,7 @@ export const createOrUpdateMapping = async (
   });
   const article = await prisma.article.findUnique({ where: { id: articleId } });
   if (!reason || !article) {
-    return res.status(404).json({ message: "Invalid reason or article ID" });
+    return res.status(404).json({ message: 'Invalid reason or article ID' });
   }
 
   // upsert mapping
@@ -65,11 +52,7 @@ export const createOrUpdateMapping = async (
   return res.json(mapping);
 };
 
-export const updateMapping = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const updateMapping = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const data = req.body;
@@ -80,15 +63,11 @@ export const updateMapping = async (
   }
 };
 
-export const deleteMapping = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const deleteMapping = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     await prisma.action.delete({ where: { id } });
-    res.json({ message: "Deleted" });
+    res.json({ message: 'Deleted' });
   } catch (err) {
     next(err);
   }

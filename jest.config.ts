@@ -1,4 +1,4 @@
-import type { JestConfigWithTsJest } from 'ts-jest'
+import type { JestConfigWithTsJest } from 'ts-jest';
 
 const config: JestConfigWithTsJest = {
   preset: 'ts-jest',
@@ -7,7 +7,7 @@ const config: JestConfigWithTsJest = {
   testMatch: ['**/*.test.ts'],
   moduleFileExtensions: ['ts', 'js', 'json'],
   setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
-  maxWorkers: 1
-}
+  maxWorkers: 1,
+};
 
 export default config;

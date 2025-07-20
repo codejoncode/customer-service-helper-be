@@ -3,6 +3,7 @@ This is the backend service for the Customer Service Helper application, designe
 
 🚀 Project Overview
 The service is built with Node.js, Express, and MongoDB. Key capabilities include:
+
 - Multi-organization support with seeded demo data
 - Secure authentication via JSON Web Tokens (JWT)
 - Role-based access control (agents, managers, admins)
@@ -10,29 +11,26 @@ The service is built with Node.js, Express, and MongoDB. Key capabilities includ
 - Modular architecture ready for deployment to Render, Heroku, or similar
 
 🧪 Tech Stack
-| Layer | Technology | 
-| Runtime | Node.js | 
-| Framework | Express.js | 
-| Database | MongoDB (via Mongoose) | 
-| Auth | JSON Web Tokens (JWT) | 
-| Security | Bcrypt, custom guards | 
-| Utilities | Dotenv, CORS, Helmet | 
-
-
+| Layer | Technology |
+| Runtime | Node.js |
+| Framework | Express.js |
+| Database | MongoDB (via Mongoose) |
+| Auth | JSON Web Tokens (JWT) |
+| Security | Bcrypt, custom guards |
+| Utilities | Dotenv, CORS, Helmet |
 
 📁 Folder Structure
 src/
-├── controllers/       # Business logic for API routes
-├── middleware/        # Auth, role enforcement, rate limits
-├── models/            # Mongoose schemas
-├── routes/            # Express route definitions
-├── seed.js            # Seed script for demo organizations
-└── app.js             # Main Express application
-.env                   # Environment variables (gitignored)
-
-
+├── controllers/ # Business logic for API routes
+├── middleware/ # Auth, role enforcement, rate limits
+├── models/ # Mongoose schemas
+├── routes/ # Express route definitions
+├── seed.js # Seed script for demo organizations
+└── app.js # Main Express application
+.env # Environment variables (gitignored)
 
 ✅ Features
+
 - 🔐 JWT-based register/login and session management
 - 🏢 Organization CRUD with plan tiers and trial agent limits
 - 👥 Agent management with roles and status flags
@@ -43,80 +41,79 @@ src/
 
 🔒 Authentication
 All auth routes use JWT. A typical flow:
+
 - User registers or logs in with /auth/register or /auth/login.
 - Server issues an access token signed with your JWT_SECRET.
 - Client includes Authorization: Bearer <token> on subsequent requests.
 - Protected routes validate the token and enforce roles.
 
 📝 Environment Variables
-| Name | Description | 
-| MONGODB_URI | MongoDB connection string | 
-| JWT_SECRET | Secret key for signing and verifying JWTs | 
-| PORT | Port number for the server (default: 3000) | 
-
+| Name | Description |
+| MONGODB_URI | MongoDB connection string |
+| JWT_SECRET | Secret key for signing and verifying JWTs |
+| PORT | Port number for the server (default: 3000) |
 
 Create a file named .env at the project root. Do not commit it.
 
-
 📦 Getting Started
+
 - Clone the repository
-git clone https://github.com/your-username/customer-service-helper-be.git
-cd customer-service-helper-be
+  git clone https://github.com/your-username/customer-service-helper-be.git
+  cd customer-service-helper-be
 - Install dependencies
-npm install
+  npm install
 - Seed demo data (optional)
-node seed.js
-
-
+  node seed.js
 
 🚀 Running the Application
+
 - Development (with auto-reload):
-npm run dev
+  npm run dev
 - Production:
-npm run build
-npm start
-
-
+  npm run build
+  npm start
 
 🧪 Testing
 Run all tests with:
 npm test
 
-
 Test coverage now focuses on:
+
 - JWT token validation and error handling
 - Protected route behavior (allowIfTrainingOrAgent)
 - Role-specific access checks
 - Call wrap-up logic and QA evaluations
-Legacy authentication tests have been removed.
+  Legacy authentication tests have been removed.
 
 📫 API Overview
 Auth
+
 - POST /auth/register
 - POST /auth/login
-Organizations
+  Organizations
 - GET /organizations
 - POST /organizations
 - PUT /organizations/:id
 - DELETE /organizations/:id
-Agents
+  Agents
 - GET /agents
 - POST /agents
 - PUT /agents/:id
 - DELETE /agents/:id
-Knowledge Base
+  Knowledge Base
 - GET /kb-articles
 - POST /kb-articles
-Members
+  Members
 - GET /members
 - POST /members
-Calls
+  Calls
 - POST /calls (start call)
 - PUT /calls/:id/wrapup (complete call with checklist)
-All protected routes use the allowIfTrainingOrAgent middleware to enforce role and trial-limit checks.
+  All protected routes use the allowIfTrainingOrAgent middleware to enforce role and trial-limit checks.
 
 🤝 Contributing
 You’re the primary maintainer right now, but future contributions are welcome:
+
 - Fork the repo
 - Create a feature branch (git checkout -b feature/xyz)
 - Commit with clear messages

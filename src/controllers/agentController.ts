@@ -1,17 +1,13 @@
 // src/controllers/agentController.ts
 
-import { Request, Response, NextFunction } from "express";
-import bcrypt from "bcrypt";
-import { prisma } from "../config/db";
+import { Request, Response, NextFunction } from 'express';
+import bcrypt from 'bcrypt';
+import { prisma } from '../config/db';
 
 const SALT_ROUNDS = 10;
 
 // GET /api/orgs/:orgId/agents
-export const getAgents = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getAgents = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { orgId } = req.params;
     const agents = await prisma.agent.findMany({
@@ -25,17 +21,13 @@ export const getAgents = async (
 };
 
 // POST /api/orgs/:orgId/agents
-export const addAgent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const addAgent = async (req: Request, res: Response, next: NextFunction) => {
   const { orgId } = req.params;
   const { name, username, password, role, email } = req.body;
 
   // 400 when missing data
   if (!name || !username || !password || !role) {
-    return res.status(400).json({ message: "Missing agent data" });
+    return res.status(400).json({ message: 'Missing agent data' });
   }
 
   try {
@@ -45,19 +37,26 @@ export const addAgent = async (
       select: { plan: true, agentLimit: true },
     });
     if (!org) {
-      return res.status(404).json({ message: "Org not found" });
+      return res.status(404).json({ message: 'Org not found' });
     }
 
     // enforce free-tier limit
     const count = await prisma.agent.count({ where: { orgId } });
-    if (org.plan === "FREE" && count >= org.agentLimit) {
-      return res.status(403).json({ message: "Free-agent limit reached" });
+    if (org.plan === 'FREE' && count >= org.agentLimit) {
+      return res.status(403).json({ message: 'Free-agent limit reached' });
     }
 
     // hash & create
     const hash = await bcrypt.hash(password, SALT_ROUNDS);
     const agent = await prisma.agent.create({
-      data: { name, email, username, passwordHash: hash, role, organization: {connect : {id : orgId }}},
+      data: {
+        name,
+        email,
+        username,
+        passwordHash: hash,
+        role,
+        organization: { connect: { id: orgId } },
+      },
       select: { id: true, name: true, username: true, role: true },
     });
 
@@ -68,11 +67,7 @@ export const addAgent = async (
 };
 
 // PUT /api/orgs/:orgId/agents/:agentId
-export const updateAgent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const updateAgent = async (req: Request, res: Response, next: NextFunction) => {
   const { agentId } = req.params;
   const { name, role } = req.body;
 
@@ -91,11 +86,7 @@ export const updateAgent = async (
 };
 
 // DELETE /api/orgs/:orgId/agents/:agentId
-export const deleteAgent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const deleteAgent = async (req: Request, res: Response, next: NextFunction) => {
   const { agentId } = req.params;
 
   try {

@@ -1,11 +1,7 @@
-import { Request, Response, NextFunction } from "express";
-import { prisma } from "../config/db";
+import { Request, Response, NextFunction } from 'express';
+import { prisma } from '../config/db';
 
-export const getChecklists = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getChecklists = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { orgId } = req.params;
     const lists = await prisma.closingItem.findMany({ where: { orgId } });
@@ -15,26 +11,18 @@ export const getChecklists = async (
   }
 };
 
-export const getChecklistById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getChecklistById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const item = await prisma.closingItem.findUnique({ where: { id } });
-    if (!item) return res.status(404).json({ message: "Not found" });
+    if (!item) return res.status(404).json({ message: 'Not found' });
     res.json(item);
   } catch (err) {
     next(err);
   }
 };
 
-export const createChecklist = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const createChecklist = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { orgId } = req.params;
     const { label } = req.body;
@@ -45,11 +33,7 @@ export const createChecklist = async (
   }
 };
 
-export const updateChecklist = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const updateChecklist = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const data = req.body;
@@ -60,15 +44,11 @@ export const updateChecklist = async (
   }
 };
 
-export const deleteChecklist = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const deleteChecklist = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     await prisma.closingItem.delete({ where: { id } });
-    res.json({ message: "Deleted" });
+    res.json({ message: 'Deleted' });
   } catch (err) {
     next(err);
   }

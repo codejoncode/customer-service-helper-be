@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
-export type TestRole = "ADMIN" | "MANAGER" | "AGENT";
+export type TestRole = 'ADMIN' | 'MANAGER' | 'AGENT';
 
 export interface TestUserPayload {
   userId: string;
@@ -9,6 +9,6 @@ export interface TestUserPayload {
 }
 
 export function generateTestJWT(payload: TestUserPayload): string {
-  const secret = process.env.JWT_SECRET || "test-secret";
-  return jwt.sign(payload, secret, { expiresIn: "1h" });
+  const secret = process.env.JWT_SECRET || 'test-secret';
+  return jwt.sign(payload, secret, { expiresIn: '1h' });
 }

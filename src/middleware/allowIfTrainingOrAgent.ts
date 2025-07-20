@@ -1,7 +1,7 @@
 // src/middleware/allowIfTrainingOrAgent.ts
 
-import { RequestHandler } from "express";
-import { Role } from "@prisma/client";
+import { RequestHandler } from 'express';
+import { Role } from '@prisma/client';
 
 const allowIfTrainingOrAgent: RequestHandler = (req, res, next) => {
   // grab the user object your auth middleware attached
@@ -13,11 +13,11 @@ const allowIfTrainingOrAgent: RequestHandler = (req, res, next) => {
   };
 
   if (!user) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 
   const { role } = user;
-  const trainingMode = req.get("X-Training-Mode") === "true";
+  const trainingMode = req.get('X-Training-Mode') === 'true';
 
   // Agents always allowed
   if (role === Role.AGENT) {
@@ -29,7 +29,7 @@ const allowIfTrainingOrAgent: RequestHandler = (req, res, next) => {
     return next();
   }
 
-  return res.status(403).json({ message: "Forbidden" });
+  return res.status(403).json({ message: 'Forbidden' });
 };
 
 export default allowIfTrainingOrAgent;

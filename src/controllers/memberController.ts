@@ -1,14 +1,10 @@
 // src/controllers/memberController.ts
 
-import { Request, Response, NextFunction } from "express";
-import { prisma } from "../config/db";
+import { Request, Response, NextFunction } from 'express';
+import { prisma } from '../config/db';
 
 // GET /organizations/:orgId/members
-export const getMembers = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getMembers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { orgId } = req.params;
     const members = await prisma.member.findMany({ where: { orgId } });
@@ -19,27 +15,13 @@ export const getMembers = async (
 };
 
 // POST /organizations/:orgId/members
-export const addMember = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const addMember = async (req: Request, res: Response, next: NextFunction) => {
   const { orgId } = req.params;
-  const { memberId, name, dob, phone, streetAddress, city, state, zipcode } =
-    req.body;
+  const { memberId, name, dob, phone, streetAddress, city, state, zipcode } = req.body;
 
   // 400 if any required field is missing
-  if (
-    !memberId ||
-    !name ||
-    !dob ||
-    !phone ||
-    !streetAddress ||
-    !city ||
-    !state ||
-    !zipcode
-  ) {
-    return res.status(400).json({ message: "Missing fields" });
+  if (!memberId || !name || !dob || !phone || !streetAddress || !city || !state || !zipcode) {
+    return res.status(400).json({ message: 'Missing fields' });
   }
 
   try {
@@ -63,11 +45,7 @@ export const addMember = async (
 };
 
 // POST /organizations/:orgId/members/validate
-export const validateMember = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const validateMember = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { orgId } = req.params;
 
@@ -76,12 +54,12 @@ export const validateMember = async (
       select: { validationFields: true },
     });
     if (!org) {
-      return res.status(404).json({ message: "Organization not found" });
+      return res.status(404).json({ message: 'Organization not found' });
     }
 
     // only look at the org's validationFields
     const provided = org.validationFields.filter(
-      (field) => req.body[field] !== undefined && req.body[field] !== ""
+      field => req.body[field] !== undefined && req.body[field] !== '',
     );
 
     // no validation inputs → automatically invalid

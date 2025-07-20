@@ -18,8 +18,6 @@ import callRouter from './routes/callRoutes';
 import validationRouter from './routes/validationRoutes';
 import { generalLimiter } from './middleware/rateLimiters';
 
-
-
 const app = express();
 const prisma = new PrismaClient();
 
@@ -29,7 +27,7 @@ app.use(
   cors({
     origin: process.env.CORS_ORIGIN || '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  })
+  }),
 );
 app.use(express.json()); // Parse JSON bodies
 app.use(generalLimiter);
@@ -68,7 +66,5 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error('Unhandled Error:', err);
   res.status(500).json({ error: err.message || 'Internal Server Error' });
 });
-
-
 
 export default app;
