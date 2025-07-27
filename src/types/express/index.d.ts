@@ -1,4 +1,5 @@
 import { Role } from './Role';
+import * as multer from 'multer';
 
 declare namespace Express {
   interface Request {
@@ -7,6 +8,8 @@ declare namespace Express {
       role: Role;
       orgId: string;
     };
+    file?: multer.File;
+    files?: multer.File[];
   }
 }
 

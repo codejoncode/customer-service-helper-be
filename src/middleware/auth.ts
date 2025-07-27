@@ -1,53 +1,46 @@
+// src/middleware/auth.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { Role } from '../types/Role';
 
-// augment Express Request to include `user`
 declare global {
   namespace Express {
     interface Request {
       user?: {
         userId: string;
         orgId: string;
-        role: 'ADMIN' | 'MANAGER' | 'AGENT';
+        role: Role;
       };
     }
   }
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
+const ALLOWED_ROLES: Role[] = ['ADMIN', 'MANAGER', 'AGENT'];
 
-/**
- * Verifies the JWT from the Authorization header
- * and attaches `user` to req
- */
-export default async function auth(req: Request, res: Response, next: NextFunction) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'No token provided' });
+export default function auth(req: Request, res: Response, next: NextFunction) {
+  const header = req.headers.authorization;
+  if (!header?.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Missing or invalid token' });
   }
 
   try {
-    const token = authHeader.split(' ')[1];
-    const payload = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
+    const token = header.slice(7);
+    const payload = jwt.verify(token, JWT_SECRET) as any;
 
-    // ensure we have the expected fields
+    const { userId, orgId, role } = payload;
     if (
-      typeof payload.userId !== 'string' ||
-      typeof payload.orgId !== 'string' ||
-      typeof payload.role !== 'string'
+      typeof userId !== 'string' ||
+      typeof orgId !== 'string' ||
+      typeof role !== 'string' ||
+      !ALLOWED_ROLES.includes(role as Role)
     ) {
-      throw new Error('Invalid token payload');
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    req.user = {
-      userId: payload.userId,
-      orgId: payload.orgId,
-      role: payload.role as Role,
-    };
+    req.user = { userId, orgId, role: role as Role };
     return next();
-    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  } catch (err) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  } catch {
+    return res.status(401).json({ error: 'Invalid or expired token' });
   }
 }

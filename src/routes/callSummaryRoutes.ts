@@ -6,7 +6,8 @@ import validateMemberInput from '../middleware/validateMemberInput';
 // tells Express to match and nested routers inheirt params
 const router = express.Router({ mergeParams: true });
 
-router.post('/', requireRole(['MANAGER', 'ADMIN']), validateMemberInput, generate);
-router.get('/:id', requireRole(['MANAGER', 'ADMIN']), getById);
+// Agents need to read and write
+router.post('/', requireRole(['MANAGER', 'ADMIN', 'AGENT']), validateMemberInput, generate);
+router.get('/:id', requireRole(['MANAGER', 'ADMIN', 'AGENT']), getById);
 
 export default router;

@@ -11,10 +11,10 @@ import {
 
 const router = Router({ mergeParams: true });
 
-router.get('/', auth, roles(['ADMIN', 'MANAGER']), getActions);
-router.get('/:id', auth, roles(['ADMIN', 'MANAGER']), getActionById);
-router.post('/', auth, roles(['ADMIN', 'MANAGER']), createOrUpdateMapping);
-router.put('/:id', auth, roles(['ADMIN', 'MANAGER']), updateMapping);
-router.delete('/:id', auth, roles(['ADMIN', 'MANAGER']), deleteMapping);
+router.get('/', auth, roles(['ADMIN', 'MANAGER', 'AGENT']), getActions);
+router.get('/:id', auth, roles(['ADMIN', 'MANAGER', 'AGENT']), getActionById);
+router.post('/', auth, roles(['ADMIN', 'MANAGER', 'AGENT']), createOrUpdateMapping);
+router.put('/:id', auth, roles(['ADMIN', 'MANAGER', 'AGENT']), updateMapping);
+router.delete('/:id', auth, roles(['ADMIN', 'MANAGER', 'AGENT']), deleteMapping);
 
 export default router;

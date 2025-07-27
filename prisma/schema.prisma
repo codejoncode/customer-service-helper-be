@@ -9,7 +9,7 @@ datasource db {
 
 model Organization {
   id               String        @id @default(cuid())
-  name             String
+  name             String        @unique
   plan             Plan          @default(FREE)
   agentLimit       Int           @default(3)
   createdAt        DateTime      @default(now())
@@ -22,6 +22,10 @@ model Organization {
   callReasons      CallReason[]
   closingItems     ClosingItem[]
   members          Member[]
+  escalations      Escalation[]
+  trainingLogs     TrainingLog[]
+  bugReports       BugReport[]
+  importJobs       ImportJob[]
 }
 
 model Agent {
@@ -35,6 +39,7 @@ model Agent {
   organization   Organization?         @relation(fields: [orgId], references: [id])
   callLogs       CallLog[]
   validationLogs MemberValidationLog[]
+  trainingLogs   TrainingLog[]
 }
 
 model Member {
@@ -47,10 +52,12 @@ model Member {
   city           String
   state          String
   zipcode        String
+  country        String                @default("US")
   orgId          String
   callLogs       CallLog[]
   organization   Organization          @relation(fields: [orgId], references: [id])
   validationLogs MemberValidationLog[]
+  escalations    Escalation[]
 }
 
 model Action {
@@ -75,6 +82,67 @@ model Article {
   actions      Action[]
   organization Organization @relation(fields: [orgId], references: [id])
   callLogs     CallLog[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  tags         String[]
+  summary      String
+
+  @@index([orgId])
+}
+
+model Escalation {
+  id         String   @id @default(cuid())
+  callLogId  String
+  memberId   String
+  reason     String?
+  auditLog   Json?
+  orgId      String
+  status     String   @default("pending") // pending, sent, failed
+  retryCount Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  callLog      CallLog      @relation(fields: [callLogId], references: [id])
+  member       Member       @relation(fields: [memberId], references: [id])
+  organization Organization @relation(fields: [orgId], references: [id])
+
+  @@index([orgId])
+  @@index([callLogId])
+}
+
+model TrainingLog {
+  id        String   @id @default(cuid())
+  agentId   String
+  callLogId String?
+  prompts   Json
+  responses Json
+  training  Boolean  @default(true)
+  orgId     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent        Agent?       @relation(fields: [agentId], references: [id])
+  callLog      CallLog?     @relation(fields: [callLogId], references: [id])
+  organization Organization @relation(fields: [orgId], references: [id])
+
+  @@index([orgId])
+}
+
+model BugReport {
+  id               String   @id @default(cuid())
+  errorMessage     String
+  stackTrace       String
+  userContext      Json
+  screenshotUrl    String?
+  stepsToReproduce String?
+  status           String   @default("open") // open, in_progress, closed
+  orgId            String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  organization Organization @relation(fields: [orgId], references: [id])
+
+  @@index([orgId])
 }
 
 model ClosingItem {
@@ -94,22 +162,24 @@ model CallReason {
 }
 
 model CallLog {
-  id               String       @id @default(cuid())
+  id               String        @id @default(cuid())
   orgId            String
   agentId          String
   memberId         String
   reasonId         String
   articleId        String
-  actionsTaken     String[]     @db.Text
-  closingChecklist String[]     @db.Text
+  actionsTaken     String[]      @db.Text
+  closingChecklist String[]      @db.Text
   notes            String
-  createdAt        DateTime     @default(now())
-  agent            Agent        @relation(fields: [agentId], references: [id])
-  article          Article      @relation(fields: [articleId], references: [id])
-  member           Member       @relation(fields: [memberId], references: [id])
-  org              Organization @relation(fields: [orgId], references: [id])
-  callReason       CallReason   @relation(fields: [reasonId], references: [id])
+  createdAt        DateTime      @default(now())
+  agent            Agent         @relation(fields: [agentId], references: [id])
+  article          Article       @relation(fields: [articleId], references: [id])
+  member           Member        @relation(fields: [memberId], references: [id])
+  org              Organization  @relation(fields: [orgId], references: [id])
+  callReason       CallReason    @relation(fields: [reasonId], references: [id])
   callSummary      CallSummary?
+  escalations      Escalation[]
+  trainingLogs     TrainingLog[]
 }
 
 model FAQ {
@@ -149,6 +219,23 @@ model MemberValidationLog {
   fieldsChecked String[]
   passed        Boolean
   agent         Agent    @relation(fields: [agentId], references: [id])
+}
+
+model ImportJob {
+  id            String       @id @default(cuid())
+  orgId         String
+  filename      String
+  status        String // 'pending', 'processing', 'completed', 'failed'
+  created       Int          @default(0)
+  updated       Int          @default(0)
+  failed        Int          @default(0)
+  errorLog      Json? // array of failed rows
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  uploadedBy    String
+  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  retryCount    Int          @default(0)
+  lastRetriedAt DateTime?
 }
 
 enum Role {

@@ -3,7 +3,12 @@ import { FaqSeedEntry } from '../src/types/FaqSeedEntry';
 
 const prisma = new PrismaClient();
 
-const accountFaqs: FaqSeedEntry[] = [
+const createdBy = 'system'; // Replace with actual seeded user ID if needed
+
+const tagWrap = (entries: Omit<FaqSeedEntry, 'createdBy'>[]): FaqSeedEntry[] =>
+  entries.map(entry => ({ ...entry, createdBy }));
+
+const accountFaqs = tagWrap([
   {
     question: 'How do I create a new account?',
     answer:
@@ -31,9 +36,9 @@ const accountFaqs: FaqSeedEntry[] = [
     answer: 'No — your account is active as soon as it’s confirmed by email.',
     tags: ['signup', 'activation', 'account'],
   },
-];
+]);
 
-const loginFaqs: FaqSeedEntry[] = [
+const loginFaqs = tagWrap([
   {
     question: 'How do I reset my password?',
     answer:
@@ -62,8 +67,9 @@ const loginFaqs: FaqSeedEntry[] = [
       'We use encryption and access controls to ensure your data is protected. Keep your password private and updated.',
     tags: ['security', 'account', 'data'],
   },
-];
-const featureFaqs: FaqSeedEntry[] = [
+]);
+
+const featureFaqs = tagWrap([
   {
     question: 'Where can I find my recent activity?',
     answer: 'Your dashboard displays recent interactions, updates, and call history.',
@@ -90,8 +96,9 @@ const featureFaqs: FaqSeedEntry[] = [
       'Loop lets you collaborate with agents and view live summaries tied to call logs and transcripts.',
     tags: ['loop', 'collaboration', 'integration'],
   },
-];
-const troubleshootingFaqs: FaqSeedEntry[] = [
+]);
+
+const troubleshootingFaqs = tagWrap([
   {
     question: 'Why isn’t my checklist saving?',
     answer: 'Make sure all required fields are filled and that your connection is stable.',
@@ -120,8 +127,9 @@ const troubleshootingFaqs: FaqSeedEntry[] = [
     answer: 'It may be delayed by transcript processing. Wait a moment or refresh the Loop tab.',
     tags: ['summary', 'agent', 'performance'],
   },
-];
-const trainingFaqs: FaqSeedEntry[] = [
+]);
+
+const trainingFaqs = tagWrap([
   {
     question: 'What is Training Mode?',
     answer:
@@ -151,7 +159,7 @@ const trainingFaqs: FaqSeedEntry[] = [
       'Yes — past sessions are saved under the Training tab. You can replay and view feedback.',
     tags: ['training', 'sessions', 'feedback'],
   },
-];
+]);
 
 const faqs: FaqSeedEntry[] = [
   ...accountFaqs,
@@ -163,7 +171,7 @@ const faqs: FaqSeedEntry[] = [
 
 async function main() {
   for (const faq of faqs) {
-    await prisma.fAQ.create({ data: faq, skipDuplicates: true });
+    await prisma.fAQ.create({ data: faq });
   }
 }
 

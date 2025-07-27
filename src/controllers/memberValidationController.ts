@@ -1,50 +1,15 @@
-// src/controllers/memberController.ts
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../config/db';
 
-export const getMembers = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { orgId } = req.params;
-    const members = await prisma.member.findMany({ where: { orgId } });
-    res.json(members);
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const addMember = async (req: Request, res: Response, next: NextFunction) => {
-  const { orgId } = req.params;
-  const { memberId, name, dob, phone, streetAddress, city, state, zipcode } = req.body;
-
-  if (!memberId || !name || !dob || !phone || !streetAddress || !city || !state || !zipcode) {
-    return res.status(400).json({ message: 'Missing fields' });
-  }
-
-  try {
-    const member = await prisma.member.create({
-      data: {
-        memberId,
-        name,
-        dob,
-        phone,
-        streetAddress,
-        city,
-        state,
-        zipcode,
-        orgId,
-      },
-    });
-    res.status(201).json(member);
-  } catch (err) {
-    next(err);
-  }
-};
-
+/**
+ * POST /api/orgs/:orgId/members/:memberId/validate
+ */
 export const validateMember = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { orgId, memberId } = req.params;
     const { name, dob, phone, streetAddress, zipcode } = req.body;
 
+    // 1) Confirm org exists and get fields to validate
     const org = await prisma.organization.findUnique({
       where: { id: orgId },
       select: { validationFields: true },
@@ -53,14 +18,16 @@ export const validateMember = async (req: Request, res: Response, next: NextFunc
       return res.status(404).json({ message: 'Organization not found' });
     }
 
-    const member = await prisma.member.findUnique({
-      where: { id: memberId },
+    // 2) Lookup member by external memberId + org
+    const member = await prisma.member.findFirst({
+      where: { orgId, memberId },
     });
-    if (!member || member.orgId !== orgId) {
+    if (!member) {
       return res.status(404).json({ message: 'Member not found or org mismatch' });
     }
 
-    const results = {
+    // 3) Compare fields
+    const results: Record<string, boolean> = {
       name: member.name === name,
       dob: member.dob === dob,
       phone: member.phone === phone,
@@ -68,24 +35,20 @@ export const validateMember = async (req: Request, res: Response, next: NextFunc
       zipcode: member.zipcode === zipcode,
     };
 
+    // 4) Partition matched vs failed
     const matchedFields = Object.entries(results)
-      .filter(([_, matched]) => matched)
+      .filter(([_, ok]) => ok)
       .map(([field]) => field);
-
     const failedFields = Object.entries(results)
-      .filter(([_, matched]) => !matched)
+      .filter(([_, ok]) => !ok)
       .map(([field]) => field);
 
+    // 5) Valid if at least two fields match
     const valid = matchedFields.length >= 2;
 
-    res.json({
-      valid,
-      results,
-      matchedFields,
-      failedFields,
-    });
+    return res.json({ valid, results, matchedFields, failedFields });
   } catch (err) {
     console.error('Validation error:', err);
-    next(err);
+    return next(err);
   }
 };

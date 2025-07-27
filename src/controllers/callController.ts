@@ -4,8 +4,8 @@ import { prisma } from '../config/db';
 export const createCall = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { orgId } = req.params;
-    const { memberId, agentId, reasonId, articleId, actionsTaken, closingChecklist, notes } =
-      req.body;
+    const { memberId, reasonId, articleId, actionsTaken, closingChecklist, notes } = req.body;
+    const agentId = req.user?.userId; // drawn from JWT
 
     if (
       !memberId ||

@@ -1,7 +1,5 @@
-// src/middleware/allowIfTrainingOrAgent.ts
-
 import { RequestHandler } from 'express';
-import { Role } from '@prisma/client';
+import { Role } from '../constants/roles';
 
 const allowIfTrainingOrAgent: RequestHandler = (req, res, next) => {
   // grab the user object your auth middleware attached
@@ -20,12 +18,12 @@ const allowIfTrainingOrAgent: RequestHandler = (req, res, next) => {
   const trainingMode = req.get('X-Training-Mode') === 'true';
 
   // Agents always allowed
-  if (role === Role.AGENT) {
+  if (role === 'AGENT') {
     return next();
   }
 
   // Managers/Admins only if trainingMode flag is on
-  if ((role === Role.MANAGER || role === Role.ADMIN) && trainingMode) {
+  if ((role === 'MANAGER' || role === 'ADMIN') && trainingMode) {
     return next();
   }
 
