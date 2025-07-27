@@ -1,0 +1,21 @@
+app = "jon-holloway-customer-service-helper-be" # ← Change this to your actual Fly app name
+
+[env]
+  DATABASE_URL = "your-database-url"
+  JWT_SECRET = "your-jwt-secret"
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 80
+
+  [[services.ports]]
+    port = 443
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+    grace_period = "5s"
+    restart_limit = 5
