@@ -26,3 +26,7 @@ yarn-error.log*
 /src/generated/prisma
 .env
 .env.test
+dist/** 
+*.d.ts
+build/**
+*.js.map
